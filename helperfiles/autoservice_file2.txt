@@ -1,0 +1,65 @@
+<!-- I finally got it working! So I 
+uninstalled pymongo, tornado, and python-twisted (and any other packages I had manually installed that had caused the roslaunch not to run). 
+After uninstalling, I ran rosdep install, which will install all dependent packages needed for your current ros setup:
+rosdep install --from-paths src --ignore-src -r -y -->
+
+
+
+sudo cp roshub.service /etc/systemd/system/roshub.service
+
+[Unit]
+Description=start roscore and roslauch all nodes
+Wants=network-online.target
+After=network.target network-online.target remote-fs.target syslog.target
+
+[Service]
+ExecStart=/home/pi/repos/ros_hub/rosstartup.sh
+Restart=always
+User=pi
+StandardOutput=inherit
+StandardError=inherit
+
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+Example 1: -----------------
+[Unit]
+Description=start roscore and roslauch all nodes
+After=network.target
+StartLimitIntervalSec=0
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=1
+User=centos
+ExecStart=/usr/bin/env php /path/to/server.php
+
+[Install]
+WantedBy=multi-user.target
+
+
+
+Example 2:------------------
+[Unit]
+Description=start roscore
+After=remote-fs.target
+After=syslog.target
+[Service]
+ExecStart=/usr/local/bin/rosCoreService.sh
+Restart=on-abort
+
+[Install]
+WantedBy=multi-user.target
+
+
+rosstartup.sh file ---------------------------
+#!/bin/bash
+
+source /opt/ros/kinetic/setup.bash
+source /home/pi/repos/ros_hub/devel/setup.bash
+roslaunch hubmain hubmain.launch
+

@@ -1,0 +1,14 @@
+<html>
+   <head>
+      <title>{{ title }}</title>
+   </head>
+   <body>
+
+     <ul>
+       {% for link in items['urllinks'] %}
+         <li>'<a href="{{ escape(link['ref']) }}">{{ link['name'] }}</a>'</li>
+       {% end %}
+     </ul>
+   
+   </body>
+ </html>

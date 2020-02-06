@@ -1,0 +1,15 @@
+
+<launch>
+
+
+<node name="hallcam" pkg="roscamhub" type="cvwebcampub" args="hall 0" respawn="true" />
+<node name="webvideoserver" pkg="web_video_server" type="web_video_server" args="" respawn="true" />
+<node name="rosbotwebserver" pkg="hubmain" type="rosroverdashserver.py" args="" respawn="true" />
+
+<include file="$(find rosbridge_server)/launch/rosbridge_websocket.launch" > 
+     <arg name="port" value="9090"/>
+</include>
+
+
+</launch>
+

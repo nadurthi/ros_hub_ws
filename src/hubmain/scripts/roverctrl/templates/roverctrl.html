@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <script src="https://static.robotwebtools.org/EventEmitter2/current/eventemitter2.min.js"></script>
+        <script src="static/roslib.js"></script>
+        <script>
+        // Connecting to ROS
+        // -----------------
+        var ros = new ROSLIB.Ros();
+        // If there is an error on the backend, an 'error' emit will be emitted.
+        ros.on('error', function(error) {
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('connected').style.display = 'none';
+        document.getElementById('closed').style.display = 'none';
+        document.getElementById('error').style.display = 'inline';
+        console.log(error);
+        });
+        // Find out exactly when we made a connection.
+        ros.on('connection', function() {
+        console.log('Connection made!');
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('error').style.display = 'none';
+        document.getElementById('closed').style.display = 'none';
+        document.getElementById('connected').style.display = 'inline';
+        });
+        ros.on('close', function() {
+        camfreqparam.set(1);
+        console.log('Connection closed.');
+        document.getElementById('connecting').style.display = 'none';
+        document.getElementById('connected').style.display = 'none';
+        document.getElementById('closed').style.display = 'inline';
+        });
+        // Create a connection to the rosbridge WebSocket server.
+        ros.connect('ws://'+items['roshubmainip']+':9090');
+        // Publishing a Topic
+        // ------------------
+        // First, we create a Topic object with details of the topic's name and message type.
+        var cmdVel = new ROSLIB.Topic({
+        ros : ros,
+        name : '/key_vel',
+        messageType : 'geometry_msgs/Twist'
+        });
+        // Then we create the payload to be published. The object we pass in to ros.Message matches the
+        // fields defined in the geometry_msgs/Twist.msg definition.
+        var twist = new ROSLIB.Message({
+        linear : {
+        x : 100,
+        y : 0.0,
+        z : 0.0
+        },
+        angular : {
+        x : 0.0,
+        y : 0.0,
+        z : 100
+        }
+        });
+        // And finally, publish.
+        cmdVel.publish(twist);
+        //Subscribing to a Topic
+        //----------------------
+        // Like when publishing a topic, we first create a Topic object with details of the topic's name
+        // and message type. Note that we can call publish or subscribe on the same topic object.
+        var listener = new ROSLIB.Topic({
+        ros : ros,
+        name : '/listener',
+        messageType : 'std_msgs/String'
+        });
+        // Then we add a callback to be called every time a message is published on this topic.
+        listener.subscribe(function(message) {
+        console.log('Received message on ' + listener.name + ': ' + message.data);
+        // If desired, we can unsubscribe from the topic as well.
+        listener.unsubscribe();
+        });
+        
+        // Setting a param value
+        // ---------------------
+        ros.getParams(function(params) {
+        console.log(params);
+        });
+        // Getting a param value
+        // ---------------------
+        var camfreqparam = new ROSLIB.Param({
+        ros : ros,
+        name : '/roverbot/camfreq'
+        });
+        var rovercamfreqparam = new ROSLIB.Param({
+        ros : ros,
+        name : '/roverbot/camfreq'
+        });
+        // camfreqparam.set(1);
+        camfreqparam.get(function(value) {
+        
+        document.getElementById("camfreqinputid").value = value;
+        console.log('My robot\'s camfreqparam is ' + value);
+        });
+        function moveFront() {
+        console.log("OK")
+        var twist = new ROSLIB.Message({
+        linear : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        },
+        angular : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        }
+        });
+        var linspeed = document.getElementById("moverate").value;
+        twist.linear.x = Number(linspeed);
+        twist.angular.z = 0;
+        cmdVel.publish(twist);
+        }
+        function moveBack() {
+        var twist = new ROSLIB.Message({
+        linear : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        },
+        angular : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        }
+        });
+        var linspeed = document.getElementById("moverate").value;
+        twist.linear.x = -Number(linspeed);
+        twist.angular.z = 0;
+        cmdVel.publish(twist);
+        }
+        function moveLeft() {
+        var twist = new ROSLIB.Message({
+        linear : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        },
+        angular : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        }
+        });
+        var angspeed = document.getElementById("turnrate").value;
+        twist.angular.z = Number(angspeed);
+        twist.linear.x = 0;
+        cmdVel.publish(twist);
+        }
+        function moveRight() {
+        var twist = new ROSLIB.Message({
+        linear : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        },
+        angular : {
+        x : 0.0,
+        y : 0.0,
+        z : 0.0
+        }
+        });
+        var angspeed = document.getElementById("turnrate").value;
+        twist.angular.z = -Number(angspeed);
+        twist.angular.x = 0;
+        cmdVel.publish(twist);
+        }
+        function setcamfreq(){
+        var camfreq = document.getElementById("camfreqinputid").value;
+        camfreq = Number(camfreq);
+        camfreqparam.set(camfreq);
+        }
+        function myFunction22() {
+        console.log('Hello');
+        }
+        function videosrcselect(){
+        var src = document.getElementById("videoseclectdropdwn").value;
+        d = new Date();
+        // $("#videosourceId").attr("src", src+"?"+d.getTime());
+        document.getElementById('videosourceId').src=document.getElementById("videoseclectdropdwn").value+"?random="+d.getTime();
+        setTimeout(myFunction22, 2000);
+        document.getElementById('videosourceId').src=document.getElementById("videoseclectdropdwn").value;
+        }
+        </script>
+    </head>
+    <body>
+        <h1>Rover Controller</h1>
+        <div id="statusIndicator">
+            <p id="connecting">
+                Connecting to rosbridge...
+            </p>
+            <p id="connected" style="color:#00D600; display:none">
+                Connected
+            </p>
+            <p id="error" style="color:#FF0000; display:none">
+                Error in the backend!
+            </p>
+            <p id="closed" style="display:none">
+                Connection closed.
+            </p>
+        </div>
+        <select id="videoseclectdropdwn" onchange="videosrcselect()">
+            <option value="http://192.168.2.105:8080/stream?topic=/hall/camera/image">hall</option>
+            <option value="http://192.168.2.105:8080/stream?topic=/roverbot/camera/image">rover</option>
+        </select>
+        <button onclick="videosrcselect()">Switch video source</button>
+        <div id="videosourcedivId">
+            <img id="videosourceId" src="http://192.168.2.105:8080/stream?topic=/roverbot/camera/image"></img>
+        </div>
+        {# <p> #}
+            {# Cam Freq: <input type="text" value="123" id="camfreqinputid"> #}
+            {# <button onclick="setcamfreq()">Set Cam Rate</button> #}
+        {# </p> #}
+        
+        <p>
+            Move Rate: <input type="text" value="100" id="moverate">
+        </p>
+        <p>
+            Rurn Rate: <input type="text" value="100" id="turnrate">
+        </p>
+        <p>
+            <button onclick="moveFront()">Front</button>
+            <button onclick="moveBack()">Back</button>
+            <button onclick="moveLeft()">Left</button>
+            <button onclick="moveRight()">Right</button>
+        </p>
+        
+    </body>
+</html>

@@ -1,0 +1,3 @@
+[submodule "src/ros_utils"]
+	path = src/ros_utils
+	url = git@github.com:nadurthi/ros_utils.git

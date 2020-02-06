@@ -1,0 +1,8 @@
+
+<launch>
+
+
+<node name="hallcam" pkg="roscamhub" type="cvwebcampub" args="hall 0" respawn="true" />
+
+
+</launch>

@@ -1,0 +1,16 @@
+[Unit]
+Description=start roscore and roslauch all nodes
+Wants=network-online.target
+After=network.target network-online.target remote-fs.target syslog.target
+
+[Service]
+ExecStart=/bin/bash /home/pi/repos/ros_hub/rosstartup.sh
+WorkingDirectory=/home/pi/repos/ros_hub
+Restart=always
+User=pi
+StandardOutput=inherit
+StandardError=inherit
+
+
+[Install]
+WantedBy=multi-user.target

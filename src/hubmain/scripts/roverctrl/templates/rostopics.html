@@ -1,0 +1,18 @@
+<html>
+   <head>
+      <title>{{ title }}</title>
+   </head>
+   <body>
+     <table>
+      <tr>
+        <th> TOpics </th> <th> Type </th>  
+      </tr>
+       {% for topic in items['rostopics'] %}
+       <tr>
+        <td> {{ escape(topic[0]) }} </td> <td> {{ escape(topic[1]) }} </td>  
+      </tr>
+        
+       {% end %}
+     </table>
+   </body>
+ </html>
